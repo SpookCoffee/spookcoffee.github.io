@@ -142,16 +142,51 @@ export class World {
     // decorative hedges
     for(const dz of [-d*.42,d*.42])this.box(x+face*(w/2+3),0,z+dz,2.6,.7,2.8,this.material('#43593f'));
   }
-  sign(text,x,y,z,color='#ffffff',face=1) {
-    // Canvas-drawn texture for signage; all local, no external font file.
-    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=180;
-    const ctx=canvas.getContext('2d');ctx.fillStyle='#252529';ctx.fillRect(0,0,1024,180);
-    ctx.strokeStyle='#75636a';ctx.lineWidth=5;ctx.strokeRect(3,3,1018,174);
-    ctx.font='bold 75px system-ui, Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=color;ctx.fillText(text,512,90,955);
-    const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
-    const sign=new THREE.Mesh(new THREE.PlaneGeometry(10.5,1.85),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
-    sign.position.set(x,y,z);sign.rotation.y=Math.PI/2;this.scene.add(sign);
+  /**
+   * Create a readable sign facing the nearby parking area.
+   *
+   * A PlaneGeometry faces +Z before rotation. When a building is on the
+   * opposite side of the street, the front must point in the opposite
+   * X direction or its letters will look mirrored from behind.
+   *
+   * face =  1: front faces +X (Portfolio side)
+   * face = -1: front faces -X (Contact-ID and construction side)
+   */
+  sign(text, x, y, z, color = '#ffffff', face = 1) {
+    // Draw the label once on a canvas and use it as the sign's texture.
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 180;
+
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#252529';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = '#75636a';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
+
+    ctx.font = 'bold 75px system-ui, Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = color;
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2, 955);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+
+    // Don't render the back of the sign: that would show reversed text.
+    const material = new THREE.MeshBasicMaterial({
+      map: texture,
+      side: THREE.FrontSide
+    });
+
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(10.5, 1.85), material);
+    sign.position.set(x, y, z);
+    sign.rotation.y = face === 1 ? Math.PI / 2 : -Math.PI / 2;
+    this.scene.add(sign);
   }
+
   createConstructionSite() {
     const x=90,z=87;
     // Gravel construction yard along the winding dirt access road.

@@ -58,7 +58,7 @@ export class Hud {
     const c=this.ctx;if(!c)return;
     const W=this.map.width,H=this.map.height,scale=.72;
     c.clearRect(0,0,W,H);c.fillStyle='#1f2923';c.fillRect(0,0,W,H);
-    const px=x=>W/2+(x-13)*scale;
+    const px=x=>W/2-(x-13)*scale;
     const py=z=>H/2-(z-4)*scale;
     for(const path of world.paths){
       c.strokeStyle=path.type==='dirt'?'#ae895f':'#55585b';c.lineWidth=path.width*scale;
@@ -71,6 +71,9 @@ export class Hud {
       c.fillStyle=d.color;c.fill();c.strokeStyle='#151515';c.lineWidth=1.4;c.stroke();
       c.font='bold 9px system-ui';c.textAlign='center';c.fillStyle='#f6f4ef';c.fillText(d.id==='construction'?'BUILD':d.id==='contact'?'ID':'CV',px(d.position.x),py(d.position.z)-11);
     }
+    // The map is fixed north-up: +Z points up and +X points right.
+    // Canvas rotation is clockwise-positive, so use +heading to make the
+    // arrow match the vehicle's actual direction (east/right stays right).
     c.save();c.translate(px(vehicle.position.x),py(vehicle.position.z));c.rotate(-vehicle.heading);
     c.fillStyle='#ffd9df';c.strokeStyle='#401e27';c.lineWidth=1.5;c.beginPath();c.moveTo(0,-8);c.lineTo(5,6);c.lineTo(0,3);c.lineTo(-5,6);c.closePath();c.fill();c.stroke();c.restore();
     c.strokeStyle='#536157';c.strokeRect(.5,.5,W-1,H-1);

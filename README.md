@@ -90,3 +90,11 @@ As long as GitHub Pages is configured to publish from `main`, committing to `Fre
 - Portfolio goes to `/Portfolio/`; if Portfolio isn't published yet, that destination may lead to a missing page. Change its URL in `src/data/destinations.js` when ready.
 - Large phones / older computers may have limited 3D performance. Quick links provide an alternative to driving.
 - Keyboard and mouse are the target for Alpha v0.1; touch controls are an early convenience, not final mobile optimization.
+
+## Sign and minimap orientation correction
+
+- `src/game/World.js`: each sign faces toward its parking area. Signs render only their readable front faces. A stray brace left from an earlier edit was removed.
+- `src/ui/Hud.js`: the north-up minimap car arrow now rotates in the same direction as the vehicle's heading. The map itself has **not** been rotated.
+- `npm test` now also checks the syntax of all `src/` JavaScript modules.
+
+These changes do not require a merge to `main`; apply them on your working development branch and preview via Live Server first.
