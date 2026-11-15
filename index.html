@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!--
+    SpookCoffee root landing page.
+    Put this file in the root of the SpookCoffee.github.io GitHub repository.
+    Public website: https://spookcoffee.github.io/
+  -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="SpookCoffee — software, systems, security and personal projects.">
+  <title>SpookCoffee | Home</title>
+  <style>
+    /* The original simple Graphite + Wine design. */
+    :root {
+      color-scheme: dark;
+      --background: #111111;
+      --card: #1b1b1b;
+      --button: #262626;
+      --border: #3a3a3a;
+      --text: #f5f5f5;
+      --muted: #bdbdbd;
+      --wine: #6e1f32;
+      --wine-hover: #84263b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 26px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--background);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    /* Center a simple, narrow card with the version below it. */
+    .page {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .card {
+      padding: clamp(24px, 5vw, 36px);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      text-align: center;
+    }
+
+    /* Round code icon — the same visual style as the first preview. */
+    .mark {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 22px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #dca8b6;
+      background: #321c23;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(30px, 7vw, 40px);
+      letter-spacing: -.04em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #e6d0d7;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .intro {
+      max-width: 360px;
+      margin: 22px auto 28px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* The two original full-width buttons stay stacked on phones. */
+    .links { display: grid; gap: 12px; }
+
+    .link {
+      min-height: 58px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text);
+      background: var(--button);
+      text-decoration: none;
+      font-weight: 650;
+    }
+
+    .link:focus-visible {
+      outline: 3px solid #dca8b6;
+      outline-offset: 3px;
+    }
+
+    /* Portfolio is not live yet, so it looks like the old wine-red button
+       but is deliberately NOT clickable. */
+    .link.portfolio {
+      background: var(--wine);
+      border-color: var(--wine);
+      cursor: default;
+    }
+
+    /* Contact-ID remains a dark secondary button, as in the older preview. */
+    .link.contact:hover { background: #323232; }
+    .link.contact { flex-direction: column; gap: 3px; }
+    .link .button-label { display: flex; align-items: center; justify-content: center; gap: 7px; }
+    .version {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    footer {
+      margin-top: 20px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+    }
+    footer strong { color: #e4c0ca; font-weight: 650; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .link.contact { transition: background 150ms ease; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main class="card">
+      <!-- Decorative icon; does not require a separate image file. -->
+      <div class="mark" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/>
+        </svg>
+      </div>
+      <h1>SpookCoffee</h1>
+      <p class="subtitle">Software · Systems · Security</p>
+      <p class="intro">Welcome to my personal website. Explore my projects, professional portfolio, and contact information.</p>
+
+      <nav class="links" aria-label="Websites">
+        <!-- Portfolio is still being developed. Replace this div with a link when published. -->
+        <div class="link portfolio" aria-label="Portfolio coming soon">
+          <span aria-hidden="true">▣</span>
+          <span>Portfolio — Coming Soon</span>
+        </div>
+
+        <!-- This link opens your existing GitHub Pages Contact-ID website. -->
+        <a class="link contact" href="https://spookcoffee.github.io/Contact-ID/">
+          <span class="button-label"><span aria-hidden="true">▤</span> Contact-ID</span>
+          <span class="version">v0.5.2 Beta</span>
+        </a>
+      </nav>
+    </main>
+
+    <!-- Version label for this ROOT website (not Contact-ID). -->
+    <footer>SpookCoffee root website · <strong>Beta v1</strong></footer>
+  </div>
+</body>
+</html>
