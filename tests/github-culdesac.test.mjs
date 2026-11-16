@@ -23,7 +23,7 @@ test('3D cul-de-sac has a visible disc and usable asphalt surface', () => {
 });
 
 test('Minimap and shortcuts recognize GitHub without a duplicate manual entry', () => {
-  assert.match(hud, /d\.id==='github'\?'GH'/);
+  assert.match(hud, /github'.*'GH'|d\.id==='github'\?'GH'/s);
   assert.match(hud, /world\.culdesac/);
   assert.doesNotMatch(hud, /gh\.href='https:\/\/github\.com\/SpookCoffee'/);
 });

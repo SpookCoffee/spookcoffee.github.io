@@ -3,7 +3,8 @@ import { distanceToPath } from './math.js';
 
 /**
  * The town is deliberately hand-made, not generated as a square grid.
- * Roads follow Catmull-Rom curves; the new district branches onto a dirt track.
+ * Roads follow Catmull-Rom curves. The finished tofu shop is on a paved
+ * side road; the WIP building sits at the unpaved end of the main road.
  */
 export class World {
   constructor(scene) {
@@ -14,6 +15,8 @@ export class World {
     // At the south end of town: an asphalt turning circle and Source Hub.
     this.culdesac = { x: 2, z: -106, radius: 12.5 };
     this.githubParking = { x: 18, z: -106, width: 17, depth: 15 };
+    this.tofuParking = { x: 69, z: 82, width: 24, depth: 18 };
+    this.worksiteParking = { x: 21, z: 109, width: 15, depth: 16 };
     this.createEnvironment();
     this.createRoads();
     this.createTown();
@@ -55,13 +58,19 @@ export class World {
     }
   }
   createRoads() {
+    // Fully paved, established part of town. The side road branches east to
+    // the finished tofu shop and connects directly to its paved parking lot.
     const paved = [
-      [[2,-99],[2,-90],[-4,-62],[-8,-32],[-3,-11],[7,13],[14,37],[20,55],[18,82],[10,112]],
+      [[2,-99],[2,-90],[-4,-62],[-8,-32],[-3,-11],[7,13],[14,37],[20,55],[18,82]],
       [[-7,-31],[1,-31],[12,-29],[20,-24]],
-      [[12,29],[2,33],[-11,36],[-23,35]]
-    ];
-    const dirt = [
+      [[12,29],[2,33],[-11,36],[-23,35]],
       [[20,55],[29,57],[38,66],[48,70],[57,77],[67,82],[78,85]]
+    ];
+    // Beyond the tofu-shop junction, the north end of MAIN ROAD is still being
+    // built. This dirt continuation goes to the new work-in-progress site.
+    // The first point slightly overlaps asphalt so the surfaces connect.
+    const dirt = [
+      [[18,81],[17,90],[14,101],[11,115]]
     ];
     for(const coordinates of paved) this.addRoad(coordinates,8.6,'asphalt');
     for(const coordinates of dirt) this.addRoad(coordinates,6.7,'dirt');
@@ -124,6 +133,11 @@ export class World {
     if (Math.hypot(position.x-this.culdesac.x, position.z-this.culdesac.z) < this.culdesac.radius) return 'asphalt';
     const lot=this.githubParking;
     if (Math.abs(position.x-lot.x) < lot.width/2 && Math.abs(position.z-lot.z) < lot.depth/2) return 'asphalt';
+    // Parking surface labels match the actual pavement/gravel under the car.
+    const tofuLot=this.tofuParking;
+    if (Math.abs(position.x-tofuLot.x) < tofuLot.width/2 && Math.abs(position.z-tofuLot.z) < tofuLot.depth/2) return 'asphalt';
+    const buildingLot=this.worksiteParking;
+    if (Math.abs(position.x-buildingLot.x) < buildingLot.width/2 && Math.abs(position.z-buildingLot.z) < buildingLot.depth/2) return 'dirt';
     let dirt=false;
     for(const path of this.paths){
       if(distanceToPath(position,path.points) < path.width*.59) {
@@ -159,7 +173,8 @@ export class World {
     this.box(-34,.05,35,13,.14,3.2,concrete);
     // Short sidewalk connecting GitHub parking to its entrance.
     this.box(26,.07,-106,3,.14,2.6,concrete);
-    this.createConstructionSite();
+    this.createTofuShopDistrict();
+    this.createFutureWorksite();
     this.addStreetFurniture();
   }
   building(x,z,w,d,h,color,name,signColor) {
@@ -222,41 +237,86 @@ export class World {
     this.scene.add(sign);
   }
 
-  createConstructionSite() {
+  createTofuShopDistrict() {
     const x=90,z=87;
-    // Gravel construction yard along the winding dirt access road.
-    this.box(86,.01,87,41,.05,36,this.material('#81765f'));
-    this.box(91,0,86,23,1,21,this.material('#75766e'),{shadow:true});
-    // unfinished steel-concrete building with open floors, pillars and scaffolding
-    const column=this.material('#a4a09a'),beam=this.material('#4d4946'),unbuilt=this.material('#8d8170');
-    for (let level=0;level<3;level++) {
-      const y=level*3.9+.2;
-      this.box(91,y,87,19,.35,16,column);
-      for(const px of [83,99])for(const pz of [80,94])this.box(px,y+.3,pz,.7,3.5,.7,column);
+    const timber=this.material('#6f5847'),
+          plaster=this.material('#d9d0be'),
+          roofDark=this.material('#2f3334'),
+          roofEdge=this.material('#474845'),
+          concrete=this.material('#8a8980');
+
+    // Finished shop: the road AND this parking lot are both paved asphalt.
+    this.box(69,.012,82,24,.04,18,this.material('#454647'));
+    for(let k=0;k<4;k++){
+      const stripe=new THREE.Mesh(new THREE.PlaneGeometry(.13,12.8),this.material('#cfcac0'));
+      stripe.rotation.x=-Math.PI/2;stripe.position.set(69-24*.38+k*24*.25,.059,82);this.scene.add(stripe);
     }
-    for(const x0 of [81,101]) for(const z0 of [78,96]) this.box(x0,0,z0,.4,11,.4,beam);
-    this.box(87,0,68,22,.25,1.6,unbuilt);
-    this.sign('COMING SOON',76,4.25,73,'#f8e0b2',-1);
-    // Crane: tall mast, jib, dangling hook (not a functional construction machine).
-    const orange=this.material('#be844b');
-    this.box(109,0,103,1.35,25,1.35,orange);
-    this.box(100,24,103,31,.8,.8,orange);
-    this.box(88,18,103,.12,6,.12,this.material('#1c2222'));
-    this.box(88,17.9,103,1.6,.55,.5,beam);
-    // Road closed barrels and a striped barricade on the yard edge.
+    // Short walkway from parking to the front entrance.
+    this.box(79,.07,82,5.5,.14,2.7,concrete);
+
+    // Main tofu shop building: low, simple, and more rustic than the town's office-like buildings.
+    this.box(92,0,87,22,7.2,15,plaster,{solid:true,pad:1.2,shadow:true});
+    this.box(92,7.2,87,24,.55,17,roofDark,{shadow:true});
+    this.box(92,7.75,87,26,.4,19,roofEdge,{shadow:true});
+    // Front porch awning.
+    this.box(81.4,3.1,87,1.0,.28,11.5,roofDark,{shadow:true});
+    this.box(83.7,3.8,87,4.5,.25,12.5,roofEdge,{shadow:true});
+    // Sliding-style front windows and door area facing the parking lot.
+    const glass=this.material('#9ab7b0',.32);
+    for(const dz of [-4.6,-1.5,1.6,4.7]) this.box(80.9,1.15,dz+87,.12,2.35,2.2,glass);
+    this.box(80.9,.03,87,.18,3.1,2.7,roofDark);
+    // Decorative timber beams.
+    for(const dz of [-6.2,-2.1,2.1,6.2]) this.box(84.4,0,87+dz,.32,6.6,.32,timber);
+    for(const dz of [-6.2,6.2]) this.box(92,0,87+dz,22,.45,.4,timber);
+
+    // Simple roadside sign, facing back toward the parking area.
+    this.sign('TOFU SHOP',77.8,5.45,87,'#f4f0e5',-1);
+
+    // A small delivery van parked beside the shop adds to the tofu-delivery feel.
+    this.box(101,0,80,5.2,2.6,2.7,this.material('#d8dbe0'),{shadow:true});
+    this.box(102.1,2.35,80,2.5,1.2,2.5,this.material('#c6c9cf'),{shadow:true});
+  }
+
+  createFutureWorksite() {
+    // Follow the MAIN road north past the tofu-shop intersection.
+    // The final section of main road is unpaved and leads to this site.
+    const x=36,z=111;
+    const lot=this.worksiteParking;
+    const dirt=this.material('#81765f'),
+          column=this.material('#a4a09a'),
+          beam=this.material('#4d4946'),
+          gravel=this.material('#8d8170');
+
+    // Gravel lot connected to the unpaved end of the main road.
+    this.box(lot.x,.01,lot.z,lot.width,.05,lot.depth,dirt);
+    // Undeveloped building footprint and half-finished concrete framework.
+    this.box(x,.01,z,22,.05,20,dirt);
+    this.box(x,0,z,16,.6,14,gravel,{shadow:true});
+    for(const px of [28.5,43.5]) for(const pz of [104.5,117.5]) {
+      this.box(px,.6,pz,.65,8.2,.65,column,{shadow:true});
+    }
+    this.box(x,4.1,z,16,.35,14,column,{shadow:true});
+    this.box(x,8.3,z,16,.45,14,column,{shadow:true});
+    this.box(x,0,z-7.2,16,.3,.4,beam);
+
+    // Facing west, towards the dirt road and arriving drivers.
+    this.sign('WORK IN PROGRESS',26.5,4.3,111,'#f8e0b2',-1);
+
+    // Temporary safety barrels at the site entrance.
     const barrel=this.material('#a65f39'),stripe=this.material('#dad4c0');
-    for(let i=0;i<4;i++){
-      const bx=64+i*3;
+    for(let i=0;i<3;i++){
+      const bx=18.5+i*3.2;
       const cylinder=new THREE.Mesh(new THREE.CylinderGeometry(.65,.67,1.15,9),barrel);
-      cylinder.position.set(bx,.62,71);cylinder.castShadow=true;this.scene.add(cylinder);
-      this.box(bx,1.0,71,1.22,.16,1.22,stripe);
+      cylinder.position.set(bx,.62,100);cylinder.castShadow=true;this.scene.add(cylinder);
+      this.box(bx,1,100,1.22,.16,1.22,stripe);
     }
-    // Small spoil heaps to emphasize a town in progress.
-    for(const [hx,hz,r] of [[110,70,5],[103,111,4],[66,102,4]]) {
+    // Small piles of earth near the foundation.
+    for(const [hx,hz,r] of [[48,101,3.8],[51,116,3.5],[30,122,2.6]]) {
       const mound=new THREE.Mesh(new THREE.ConeGeometry(r,r*.68,10),this.material('#887560'));
       mound.position.set(hx,r*.32,hz);this.scene.add(mound);
     }
   }
+
   addStreetFurniture(){
     const post=this.material('#4d4d4a');const lamp=this.material('#f4ecd5');
     for(const [x,z] of [[-14,-61],[8,-10],[-19,12],[27,23],[3,72]]) {
@@ -277,7 +337,7 @@ export class World {
       // Avoid trees inside the turning circle, parking lot or new building.
       if(Math.hypot(x-this.culdesac.x,z-this.culdesac.z)<this.culdesac.radius+4)continue;
       if(Math.abs(x-25)<25 && Math.abs(z+106)<19)continue;
-      if(Math.hypot(x-43,z+24)<25 || Math.hypot(x+49,z-35)<26 || Math.hypot(x-90,z-87)<33)continue;
+      if(Math.hypot(x-43,z+24)<25 || Math.hypot(x+49,z-35)<26 || Math.hypot(x-90,z-87)<28 || Math.hypot(x-36,z-111)<25)continue;
       const tree=new THREE.Group();
       const trunkMesh=new THREE.Mesh(trunkGeo,trunk);trunkMesh.position.y=1.9;tree.add(trunkMesh);
       const crown=new THREE.Mesh(crownGeo,leaf[i%leaf.length]);crown.position.y=6.4;tree.add(crown);

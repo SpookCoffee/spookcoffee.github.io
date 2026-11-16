@@ -27,10 +27,17 @@ export const DESTINATIONS = [
     color: '#b4b8c2'
   },
   {
-    id: 'construction', name: 'Expansion District', label: 'COMING SOON',
-    description: 'A new part of SpookCoffee is being built. This destination is not open yet — check back later.',
-    url: null,
+    id: 'tofu', name: 'Mountain Tofu Shop', label: 'TOFU SHOP',
+    description: 'A quiet roadside tofu shop inspired by mountain-pass delivery stories. Step inside the Tofu-Delivery website.',
+    url: '/Tofu-Delivery/',
     position: { x: 69, z: 82 }, radius: 12,
+    color: '#e4dfc7'
+  },
+  {
+    id: 'worksite', name: 'Work In Progress', label: 'WORK IN PROGRESS',
+    description: 'Follow the main road beyond the tofu-shop turnoff to a new construction site at the unpaved northern end.',
+    url: null,
+    position: { x: 21, z: 109 }, radius: 9.5,
     color: '#b1aa88'
   }
 ];
