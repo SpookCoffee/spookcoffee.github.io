@@ -77,7 +77,13 @@ export class Hud {
     for(const d of DESTINATIONS){
       c.beginPath();c.arc(px(d.position.x),py(d.position.z),5.4,0,Math.PI*2);
       c.fillStyle=d.color;c.fill();c.strokeStyle='#151515';c.lineWidth=1.4;c.stroke();
-      c.font='bold 9px system-ui';c.textAlign='center';c.fillStyle='#f6f4ef';c.fillText(d.id==='construction'?'BUILD':d.id==='contact'?'ID':d.id==='github'?'GH':'CV',px(d.position.x),py(d.position.z)-11);
+      c.font='bold 9px system-ui';c.textAlign='center';c.fillStyle='#f6f4ef';
+      const marker = d.id==='contact' ? 'ID'
+        : d.id==='github' ? 'GH'
+        : d.id==='tofu' ? 'TOFU'
+        : d.id==='worksite' ? 'WIP'
+        : 'CV';
+      c.fillText(marker,px(d.position.x),py(d.position.z)-11);
     }
     // Because the map's X coordinates are mirrored, also mirror the car arrow.
     // This preserves the arrow's orientation relative to the roads and buildings.

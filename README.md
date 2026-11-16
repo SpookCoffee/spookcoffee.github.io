@@ -1,16 +1,16 @@
 # SpookCoffee — Free Roam (v0.1 Alpha)
 
-An experimental third-person 3D driving homepage. The town is *under development*: curving paved roads serve Portfolio and Contact-ID, while a winding dirt road leads to a construction site.
+An experimental third-person 3D driving homepage. The town is *under development*: curving paved roads serve Portfolio and Contact-ID, with a paved side road to the finished tofu shop and an unpaved continuation of the main road to a new work-in-progress building.
 
 **This is a development-branch prototype. Don't merge to `main` until you have tested it.**
 
 ## Features
 
 - 3D town built in JavaScript using [Three.js](https://threejs.org/).
-- Curved asphalt roads and branching winding dirt road.
+- Curved asphalt roads, a finished paved tofu-shop access road, and a dirt continuation of the main road to the WIP site.
 - Third-person car, keyboard controls, two camera distances, basic off-road traction, solid building collisions.
 - Parking detection: stop in a lot to get a "Would you like to enter?" dialog.
-- Under-construction destination stays in the game (no broken link).
+- A mountain tofu shop destination plus a separate farther work-in-progress site.
 - Minimap, speed readout, quick links, basic touch buttons, browser fallback.
 - No login, trackers, personal data collection, or backend required.
 
@@ -57,7 +57,7 @@ index.html                  Website layout and menus
 assets/css/style.css        UI colors, responsive CSS
 src/main.js                 Starts the game
 src/game/Game.js            Main scene, update loop
-src/game/World.js           Roads, landscape, buildings, construction site
+src/game/World.js           Roads, landscape, buildings, tofu shop, worksite
 src/game/Vehicle.js         Car model and movement
 src/game/InputController.js Keyboard / touch inputs
 src/game/CameraController.js Third-person camera
@@ -69,7 +69,7 @@ src/ui/Hud.js              Minimap, speedometer, dialogs
 tests/roadmath.test.mjs     Tests basic road math
 ```
 
-To add a building destination, start at `src/data/destinations.js`. It must also have a corresponding visible model/parking zone built in `World.js`.
+To add or rename a building destination, start at `src/data/destinations.js`. It must also have a corresponding visible model or parking zone built in `World.js`.
 
 ## Commit only to the development branch
 
@@ -107,3 +107,10 @@ These changes do not require a merge to `main`; apply them on your working devel
 - GitHub also appears in Quick Links via the same destination configuration.
 
 This package is an update to the supplied `DynamicUI` snapshot. Extract the **contents** into the actual `spookcoffee.github.io` repository folder (the one containing `.git`), not the parent `RootWebsite` folder, then commit to your existing development branch.
+
+## Tofu shop / WIP road correction
+
+- **Tofu Shop:** A completed shop at `(92, 87)`, reached using the paved branch starting from `(20, 55)`. Its parking lot at `(69, 82)` is asphalt.
+- **Work In Progress:** An unfinished structure at `(36, 111)` reached by following the **main road** north, past the tofu intersection, onto a short dirt continuation. The gravel parking trigger is at `(21, 109)`.
+- The mirrored minimap uses `TOFU` and `WIP` markers and the driving controls are unchanged.
+- **Tofu Shop destination:** `/Tofu-Delivery/` (already linked in `src/data/destinations.js`).
