@@ -45,7 +45,7 @@ export class Vehicle {
     if(throttle) this.speed = clamp(this.speed + throttle * dt * (this.speed * throttle < 0 ? 23 : 15) * traction, -max * .48, max);
     else this.speed = smooth(this.speed,0,2.1,dt);
     if(input.brake) this.speed = smooth(this.speed,0,8,dt);
-    const steer = Number(input.right) - Number(input.left);
+    const steer = Number(input.left) - Number(input.right);
     // Steering direction reverses while backing up.
     const steerResponse = clamp(Math.abs(this.speed)/5,0,1);
     this.heading += steer * (this.speed>=0 ? 1 : -1) * 1.45 * dt * steerResponse;
