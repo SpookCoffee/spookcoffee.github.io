@@ -8,3 +8,4 @@ import('./game/Game.js')
     console.error('Unable to initialize SpookCoffee Free Roam:', error);
     document.getElementById('fallback').hidden = false;
   });
+//dont know why it not work
