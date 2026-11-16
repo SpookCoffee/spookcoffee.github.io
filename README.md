@@ -1,51 +1,92 @@
-# SpookCoffee — Root Website
+# SpookCoffee — Free Roam (v0.1 Alpha)
 
-**Website:** https://spookcoffee.github.io/
+An experimental third-person 3D driving homepage. The town is *under development*: curving paved roads serve Portfolio and Contact-ID, while a winding dirt road leads to a construction site.
 
-This repository holds the **root landing page** for the SpookCoffee GitHub Pages account. It directs visitors to the Contact-ID contact card and, in the future, the Portfolio website.
+**This is a development-branch prototype. Don't merge to `main` until you have tested it.**
 
-## Current features
+## Features
 
-- Original **Graphite + Wine** dark design (kept from the uploaded repository)
-- A non-clickable **Portfolio — Coming Soon** button
-- A working **Contact-ID** button linking to https://spookcoffee.github.io/Contact-ID/
-- **Contact-ID version shown: `v0.5.2 Beta`**, copied from the uploaded `index.html`
-- Root website version in footer: **Beta v1**
-- Inline vector (SVG) briefcase and contact-card icons; no external fonts or icon libraries
+- 3D town built in JavaScript using [Three.js](https://threejs.org/).
+- Curved asphalt roads and branching winding dirt road.
+- Third-person car, keyboard controls, two camera distances, basic off-road traction, solid building collisions.
+- Parking detection: stop in a lot to get a "Would you like to enter?" dialog.
+- Under-construction destination stays in the game (no broken link).
+- Minimap, speed readout, quick links, basic touch buttons, browser fallback.
+- No login, trackers, personal data collection, or backend required.
 
-## Files
+## Create a safe new branch in VS Code
 
-| File | Purpose |
-| --- | --- |
-| `index.html` | The complete homepage: HTML structure, CSS styling, icons, and links |
-| `.nojekyll` | Optional empty file that disables Jekyll processing on GitHub Pages |
-| `README.md` | These notes; it does not control the website appearance |
-
-There is no JavaScript, build system, dependency installation, or database. Object-oriented code isn't necessary for this small static landing page.
-
-## Run locally in VS Code
-
-1. Clone or open your existing `SpookCoffee.github.io` repository in VS Code.
-2. Place `index.html`, `.nojekyll`, and `README.md` in the repository root (not inside another folder).
-3. Open `index.html` in your browser, or use a VS Code preview extension. No build command is needed.
-4. Once checked, commit and push changes to the branch that GitHub Pages deploys (usually `main`).
+Open the **SpookCoffee.github.io** repository, not Contact-ID.
 
 ```powershell
 git status
-git add index.html .nojekyll README.md
-git commit -m "Update homepage button icons"
-git push origin main
+git fetch origin
+git switch -c FreeRoam origin/main
 ```
 
-Only use `git push origin main` **if you are currently working on `main`**. Check with `git branch --show-current` first. If you're on another branch, push that branch instead and merge it after review.
+The working tree should be clean before switching. If `FreeRoam` already exists locally, use `git switch FreeRoam` instead.
 
-## Update later
+**Copy the contents of this ZIP** into the root of the checked-out project (not the containing folder). Replace `index.html`; leave `.git` untouched.
 
-- **Contact-ID version:** In `index.html`, find `<span class="version">v0.5.2 Beta</span>` and update it when you release another Contact-ID version.
-- **Root version:** Find `<strong>Beta v1</strong>` near the bottom of `index.html`.
-- **Portfolio launch:** Replace the non-clickable `<div class="link portfolio">...</div>` with an `<a href="https://spookcoffee.github.io/Portfolio/" class="link portfolio">...</a>` after the Portfolio site is published; also remove the `Coming Soon` text and change the cursor style appropriately.
-- **Styling:** Color variables are at the top of the `<style>` section in `index.html`.
+## Preview locally
 
-## Scope of this update
+- Recommended: VS Code **Live Server** extension → right-click `index.html` → **Open with Live Server**.
+- Alternative: `py -m http.server 5500` from the repository root, then visit `http://localhost:5500/`.
+- The first version uses Three.js from jsDelivr CDN, so the browser requires internet to download Three.js. After loading, no server/database is used by the simulation.
+- It will not work by double-clicking the file using `file://` because JavaScript modules require HTTP.
 
-This update **only replaces the two small square placeholder button icons with SVG icons**. It keeps the existing design, links, version numbers, spacing, colors, and text. A more elaborate device-specific layout can be added in a future release.
+## Controls
+
+| Action | Keys |
+| --- | --- |
+| Accelerate | W / ↑ |
+| Brake / reverse | S / ↓ |
+| Turn | A/D or ←/→ |
+| Handbrake | Space |
+| Change camera distance | C |
+| Minimap show/hide | M |
+| Close dialog | Escape |
+| Restart drive | Button in the bottom bar |
+
+The parking interaction triggers when you're inside the marked zone and nearly stopped. If you choose "Keep roaming," leave the parking zone and return to try again.
+
+## Files
+
+```text
+index.html                  Website layout and menus
+assets/css/style.css        UI colors, responsive CSS
+src/main.js                 Starts the game
+src/game/Game.js            Main scene, update loop
+src/game/World.js           Roads, landscape, buildings, construction site
+src/game/Vehicle.js         Car model and movement
+src/game/InputController.js Keyboard / touch inputs
+src/game/CameraController.js Third-person camera
+src/game/ParkingManager.js  Parking triggers and cooldown
+src/game/math.js           Shared simple geometry functions
+src/data/destinations.js   Parking destinations and URL routing
+src/ui/Hud.js              Minimap, speedometer, dialogs
+.nojekyll                   Disables Jekyll on GitHub Pages
+tests/roadmath.test.mjs     Tests basic road math
+```
+
+To add a building destination, start at `src/data/destinations.js`. It must also have a corresponding visible model/parking zone built in `World.js`.
+
+## Commit only to the development branch
+
+```powershell
+node --test tests/roadmath.test.mjs
+git status
+git add .
+git commit -m "Prototype free-roam developing town"
+git push -u origin FreeRoam
+```
+
+As long as GitHub Pages is configured to publish from `main`, committing to `FreeRoam` won't change the existing live site. **Do not change Settings → Pages to FreeRoam** while testing.
+
+## Caveats
+
+- Early arcade handling, not realistic vehicle physics.
+- This version uses simple geometric models, not downloaded buildings or cars.
+- Portfolio goes to `/Portfolio/`; if Portfolio isn't published yet, that destination may lead to a missing page. Change its URL in `src/data/destinations.js` when ready.
+- Large phones / older computers may have limited 3D performance. Quick links provide an alternative to driving.
+- Keyboard and mouse are the target for Alpha v0.1; touch controls are an early convenience, not final mobile optimization.
