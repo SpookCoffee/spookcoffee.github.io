@@ -19,6 +19,14 @@ export const DESTINATIONS = [
     color: '#ddc49b'
   },
   {
+    // The Source Hub sits on the small cul-de-sac behind the spawn point.
+    id: 'github', name: 'GitHub', label: 'GITHUB',
+    description: 'Visit the SpookCoffee GitHub profile to explore source code and public repositories.',
+    url: 'https://github.com/SpookCoffee',
+    position: { x: 18, z: -106 }, radius: 8.5,
+    color: '#b4b8c2'
+  },
+  {
     id: 'construction', name: 'Expansion District', label: 'COMING SOON',
     description: 'A new part of SpookCoffee is being built. This destination is not open yet — check back later.',
     url: null,

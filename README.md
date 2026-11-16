@@ -98,3 +98,12 @@ As long as GitHub Pages is configured to publish from `main`, committing to `Fre
 - `npm test` now also checks the syntax of all `src/` JavaScript modules.
 
 These changes do not require a merge to `main`; apply them on your working development branch and preview via Live Server first.
+
+## GitHub cul-de-sac (DynamicUI update)
+
+- A paved circular turnaround now ends the southern road behind the original spawn point.
+- A small GitHub building and parking lot lead to `https://github.com/SpookCoffee`.
+- The minimap includes a `GH` marker without changing the previously mirrored-X layout.
+- GitHub also appears in Quick Links via the same destination configuration.
+
+This package is an update to the supplied `DynamicUI` snapshot. Extract the **contents** into the actual `spookcoffee.github.io` repository folder (the one containing `.git`), not the parent `RootWebsite` folder, then commit to your existing development branch.

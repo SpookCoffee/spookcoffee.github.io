@@ -42,7 +42,7 @@ export class Hud {
     for(const item of DESTINATIONS.filter(d=>d.url)){
       const a=document.createElement('a');a.textContent=`${item.name} ↗`;a.href=item.url;list.appendChild(a);
     }
-    const gh=document.createElement('a');gh.textContent='GitHub ↗';gh.href='https://github.com/SpookCoffee';gh.target='_blank';gh.rel='noopener noreferrer';list.appendChild(gh);
+    // GitHub is already in DESTINATIONS, so the generated list includes it.
     this.message.replaceChildren(document.createTextNode(this.message.textContent),list);
     this.confirm.hidden=true;this.showModal();
   }
@@ -58,8 +58,16 @@ export class Hud {
     const c=this.ctx;if(!c)return;
     const W=this.map.width,H=this.map.height,scale=.72;
     c.clearRect(0,0,W,H);c.fillStyle='#1f2923';c.fillRect(0,0,W,H);
+    // Mirror the map horizontally across its vertical (Y) axis.
+    // Negate the X offset so buildings left of center appear on the right, and vice versa.
     const px=x=>W/2-(x-13)*scale;
     const py=z=>H/2-(z-4)*scale;
+    // Draw the circular dead-end behind the vehicle. It is not a road path.
+    if(world.culdesac){
+      const {x,z,radius}=world.culdesac;
+      c.beginPath();c.arc(px(x),py(z),radius*scale,0,2*Math.PI);
+      c.fillStyle='#55585b';c.fill();
+    }
     for(const path of world.paths){
       c.strokeStyle=path.type==='dirt'?'#ae895f':'#55585b';c.lineWidth=path.width*scale;
       c.lineCap='round';c.lineJoin='round';c.beginPath();
@@ -69,11 +77,10 @@ export class Hud {
     for(const d of DESTINATIONS){
       c.beginPath();c.arc(px(d.position.x),py(d.position.z),5.4,0,Math.PI*2);
       c.fillStyle=d.color;c.fill();c.strokeStyle='#151515';c.lineWidth=1.4;c.stroke();
-      c.font='bold 9px system-ui';c.textAlign='center';c.fillStyle='#f6f4ef';c.fillText(d.id==='construction'?'BUILD':d.id==='contact'?'ID':'CV',px(d.position.x),py(d.position.z)-11);
+      c.font='bold 9px system-ui';c.textAlign='center';c.fillStyle='#f6f4ef';c.fillText(d.id==='construction'?'BUILD':d.id==='contact'?'ID':d.id==='github'?'GH':'CV',px(d.position.x),py(d.position.z)-11);
     }
-    // The map is fixed north-up: +Z points up and +X points right.
-    // Canvas rotation is clockwise-positive, so use +heading to make the
-    // arrow match the vehicle's actual direction (east/right stays right).
+    // Because the map's X coordinates are mirrored, also mirror the car arrow.
+    // This preserves the arrow's orientation relative to the roads and buildings.
     c.save();c.translate(px(vehicle.position.x),py(vehicle.position.z));c.rotate(-vehicle.heading);
     c.fillStyle='#ffd9df';c.strokeStyle='#401e27';c.lineWidth=1.5;c.beginPath();c.moveTo(0,-8);c.lineTo(5,6);c.lineTo(0,3);c.lineTo(-5,6);c.closePath();c.fill();c.stroke();c.restore();
     c.strokeStyle='#536157';c.strokeRect(.5,.5,W-1,H-1);

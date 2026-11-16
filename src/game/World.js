@@ -11,6 +11,9 @@ export class World {
     this.colliders=[];
     this.paths=[];
     this.obstacles=[];
+    // At the south end of town: an asphalt turning circle and Source Hub.
+    this.culdesac = { x: 2, z: -106, radius: 12.5 };
+    this.githubParking = { x: 18, z: -106, width: 17, depth: 15 };
     this.createEnvironment();
     this.createRoads();
     this.createTown();
@@ -53,7 +56,7 @@ export class World {
   }
   createRoads() {
     const paved = [
-      [[2,-119],[2,-90],[-4,-62],[-8,-32],[-3,-11],[7,13],[14,37],[20,55],[18,82],[10,112]],
+      [[2,-99],[2,-90],[-4,-62],[-8,-32],[-3,-11],[7,13],[14,37],[20,55],[18,82],[10,112]],
       [[-7,-31],[1,-31],[12,-29],[20,-24]],
       [[12,29],[2,33],[-11,36],[-23,35]]
     ];
@@ -62,6 +65,26 @@ export class World {
     ];
     for(const coordinates of paved) this.addRoad(coordinates,8.6,'asphalt');
     for(const coordinates of dirt) this.addRoad(coordinates,6.7,'dirt');
+    this.createCuldesac();
+  }
+  /**
+   * Paved turning circle at the southern dead-end of the main road.
+   * The existing road slightly overlaps it so there is no disconnected gap.
+   */
+  createCuldesac() {
+    const { x, z, radius } = this.culdesac;
+    const makeDisc = (r, y, color) => {
+      const disc = new THREE.Mesh(
+        new THREE.CircleGeometry(r, 64), this.material(color)
+      );
+      disc.rotation.x = -Math.PI / 2;
+      disc.position.set(x, y, z);
+      disc.receiveShadow = true;
+      this.scene.add(disc);
+    };
+    // A thin gravel shoulder surrounds the paved circular end of the road.
+    makeDisc(radius + 1.25, .03, '#55534d');
+    makeDisc(radius, .055, '#414448');
   }
   addRoad(coordinates,width,type) {
     const points=coordinates.map(([x,z])=>new THREE.Vector3(x,0,z));
@@ -97,6 +120,10 @@ export class World {
     const mesh=new THREE.Mesh(geo,material);mesh.receiveShadow=true;mesh.material.side=THREE.DoubleSide;this.scene.add(mesh);return mesh;
   }
   getSurface(position){
+    // The circular turnaround and GitHub parking lot should count as asphalt.
+    if (Math.hypot(position.x-this.culdesac.x, position.z-this.culdesac.z) < this.culdesac.radius) return 'asphalt';
+    const lot=this.githubParking;
+    if (Math.abs(position.x-lot.x) < lot.width/2 && Math.abs(position.z-lot.z) < lot.depth/2) return 'asphalt';
     let dirt=false;
     for(const path of this.paths){
       if(distanceToPath(position,path.points) < path.width*.59) {
@@ -119,11 +146,19 @@ export class World {
     };
     createParking(20,-24,24,22);
     createParking(-21,35,24,22);
+    // A compact parking lot opens off the east side of the turning circle.
+    // The GitHub building is beyond the lot, so the turnaround stays drivable.
+    const lot=this.githubParking;
+    createParking(lot.x,lot.z,lot.width,lot.depth);
     this.building(43,-24,22,17,9,'#64404c','CONTACT-ID','#e1c5cc');
     this.building(-49,35,23,19,13,'#4a5660','PORTFOLIO','#efe6d3');
+    // Small developer hub at the end of the road; sign faces its parking area.
+    this.building(33,-106,12,14,7.5,'#30343d','GITHUB','#f1d4df');
     // Footpath slabs lead from lots to front doors.
     this.box(32,.05,-24,15,.14,3.2,concrete);
     this.box(-34,.05,35,13,.14,3.2,concrete);
+    // Short sidewalk connecting GitHub parking to its entrance.
+    this.box(26,.07,-106,3,.14,2.6,concrete);
     this.createConstructionSite();
     this.addStreetFurniture();
   }
@@ -239,6 +274,9 @@ export class World {
       const x=(rand()-.5)*255,z=(rand()-.5)*255,here={x,z};
       if(Math.abs(x)>124||Math.abs(z)>124)continue;
       if(this.paths.some(p=>distanceToPath(here,p.points)<p.width*.5+6))continue;
+      // Avoid trees inside the turning circle, parking lot or new building.
+      if(Math.hypot(x-this.culdesac.x,z-this.culdesac.z)<this.culdesac.radius+4)continue;
+      if(Math.abs(x-25)<25 && Math.abs(z+106)<19)continue;
       if(Math.hypot(x-43,z+24)<25 || Math.hypot(x+49,z-35)<26 || Math.hypot(x-90,z-87)<33)continue;
       const tree=new THREE.Group();
       const trunkMesh=new THREE.Mesh(trunkGeo,trunk);trunkMesh.position.y=1.9;tree.add(trunkMesh);
